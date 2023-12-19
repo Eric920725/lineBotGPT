@@ -2,17 +2,18 @@ from flask import Flask
 app = Flask(__name__)
 
 from flask import request, abort
-from linebot import LineBotApi, WebhookHandler
+from linebot import  LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
 from openai import OpenAI
 
-line_bot_api = LineBotApi(os.environ.get('yGxW+YC5ohqoo9zGT2T6gqP8Pm2WPgRnU315Kil+uw2lr2n8dwJJq12KT12PIJkCW4ievbCf9qndJxhM9NK9PnboXStnDa1vzAOywc6ukyPelFoVkcIk0lZ9ZUECsHZSHZUyevBMbY1osS3skXwPjAdB04t89/1O/w1cDnyilFU='))
-handler = WebhookHandler(os.environ.get('0a4ae178ea21bdbfaf9540b56e97db7d'))
+line_bot_api = LineBotApi(os.environ.get('line_access_token'))
+handler = WebhookHandler(os.environ.get('line_channel_secret'))
 
 client = OpenAI(
-    api_key=(os.environ.get('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'))
+    # api_key='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'
+    api_key=(os.environ.get('openAI_key'))
 )
 
 @app.route("/callback", methods=['POST'])
@@ -29,8 +30,6 @@ def callback():
 def chat(event):
     try:
         mtext = event.message.text
-        print(f"Received message: {mtext}")
-
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -45,50 +44,13 @@ def chat(event):
             ],
             max_tokens=256,
         )
-
-        print(f"OpenAI response: {response}")
-
-        replyMSG = response.choices[0].message.content
-        print(f"Reply message: {replyMSG}")
-
+    
+        replyMSG=response.choices[0].message.content
         message = TextSendMessage(
-            text=replyMSG
+            text = replyMSG
         )
-        line_bot_api.reply_message(event.reply_token, message)
-    except Exception as e:
-        print(f"Error: {e}")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
-
+        line_bot_api.reply_message(event.reply_token,message)
+    except:
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
 if __name__ == '__main__':
     app.run()
-
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
