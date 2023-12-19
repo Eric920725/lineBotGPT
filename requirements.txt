@@ -1,0 +1,4 @@
+flask
+line-bot-sdk==1.18.0
+openai
+Gunicorn
